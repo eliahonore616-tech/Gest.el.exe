@@ -1,0 +1,42 @@
+name: Build Windows
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Préparer les dossiers
+        run: |
+          mkdir -p www electron build
+          cp index.html www/index.html
+          cp main.js electron/main.js
+          cp icon.png build/icon.png
+          cp icon.ico build/icon.ico || true
+          ls -R www electron build
+      - name: Corriger package.json
+        run: |
+          node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('package.json'));p.main='electron/main.js';p.devDependencies={electron:'22.3.27','electron-builder':'24.13.3'};p.build=p.build||{};p.build.win=p.build.win||{};p.build.nsis=p.build.nsis||{};p.build.win.icon='build/icon.png';delete p.build.nsis.installerIcon;delete p.build.nsis.uninstallerIcon;fs.writeFileSync('package.json',JSON.stringify(p,null,2))"
+      - run: npm install
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Setup-Windows
+          path: dist/Setup-Minervals.exe
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: windows-v${{ github.run_number }}
+          name: Setup Windows 32/64 bits (build ${{ github.run_number }})
+          files: dist/Setup-Minervals.exe
