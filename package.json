@@ -1,0 +1,29 @@
+{
+  "name": "gestion-minervals-windows",
+  "version": "2.0.0",
+  "description": "Gestion des minervals scolaires",
+  "author": "C.S Wetsh-School",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win nsis --x64 --ia32 --publish never"
+  },
+  "devDependencies": {
+    "electron": "22.3.27",
+    "electron-builder": "24.13.3"
+  },
+  "build": {
+    "appId": "com.wetsh.minervals",
+    "productName": "Gestion des Minervals",
+    "files": ["electron/**", "www/**", "build/icon.png"],
+    "directories": { "output": "dist", "buildResources": "build" },
+    "win": { "target": "nsis", "icon": "build/icon.ico" },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "artifactName": "Setup-Minervals.${ext}"
+    }
+  }
+}
